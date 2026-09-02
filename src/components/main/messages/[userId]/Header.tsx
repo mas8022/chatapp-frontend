@@ -1,12 +1,14 @@
-"use client"
+"use client";
 import Link from "next/link";
-import { ArrowRight, MoreVertical, Phone, Video } from "lucide-react";
+import { ArrowRight, MoreVertical, Video } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import useGetUserById from "@/hooks/useGetUserById";
 import ChatLoading from "./ChatLoading";
 import { notFound } from "next/navigation";
-import OnlineBox from "./OnlineBox";
+import OnlineBox from "../../../shared/OnlineBox";
+import VoiceCallBtn from "./VoiceCallBtn";
+import { VideoCallBtn } from "./VideoCallBtn";
 
 const Header = () => {
   const { user, isPending } = useGetUserById();
@@ -15,9 +17,7 @@ const Header = () => {
     return <ChatLoading />;
   }
 
-  if (!user) {
-    notFound();
-  }
+  if (!user) notFound();
   return (
     <header className="flex h-[72px] items-center justify-between border-b border-white/10 bg-black/25 px-3 backdrop-blur-xl sm:h-[84px] sm:px-5">
       <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
@@ -56,24 +56,14 @@ const Header = () => {
       </div>
 
       <div className="flex shrink-0 items-center gap-1">
-        <Button
-          size="icon"
-          variant="ghost"
-          className="hidden rounded-xl text-zinc-300 hover:bg-blue-500/15 hover:text-blue-400 sm:inline-flex"
-          aria-label="Voice call"
-        >
-          <Phone className="size-5" />
-        </Button>
-
-        <Button
-          size="icon"
-          variant="ghost"
-          className="hidden rounded-xl text-zinc-300 hover:bg-blue-500/15 hover:text-blue-400 sm:inline-flex"
-          aria-label="Video call"
-        >
-          <Video className="size-5" />
-        </Button>
-
+        <VoiceCallBtn
+          targetUserId={user.id}
+          targetUserName={user.name || user.username}
+        />
+        <VideoCallBtn
+          targetUserId={user.id}
+          targetUserName={user.name || user.username}
+        />
         <Button
           size="icon"
           variant="ghost"

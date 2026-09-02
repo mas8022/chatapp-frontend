@@ -4,7 +4,6 @@ import MessagesList from "@/components/main/messages/[userId]/MessagesList";
 
 export default function SingleChatPage() {
 
-
   return (
     <main className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-[#030712] p-0 text-white sm:p-4 md:p-6">
       <div className="pointer-events-none absolute -right-40 -top-40 h-[380px] w-[380px] rounded-full bg-blue-600/30 blur-[120px] sm:h-[450px] sm:w-[450px] sm:blur-[130px]" />

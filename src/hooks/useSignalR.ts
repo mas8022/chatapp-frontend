@@ -23,10 +23,7 @@ export function useSignalR(listenerName?: string, handler?: SignalRHandler) {
   const hubUrl = process.env.NEXT_PUBLIC_HUB_URL;
 
   useEffect(() => {
-    if (!hubUrl) {
-      console.error("NEXT_PUBLIC_HUB_URL is not defined");
-      return;
-    }
+    if (!hubUrl) return;
 
     if (
       sharedConnection &&
@@ -52,7 +49,6 @@ export function useSignalR(listenerName?: string, handler?: SignalRHandler) {
           return conn;
         })
         .catch((error) => {
-          console.error("SignalR connection error:", error);
           connectionPromise = null;
           throw error;
         });
