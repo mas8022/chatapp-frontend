@@ -9,6 +9,7 @@ import {
   Loader2,
   Mic,
   Trash2,
+  Reply,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,12 +17,19 @@ import { useSignalR } from "@/hooks/useSignalR";
 import { useParams } from "next/navigation";
 import axios from "axios";
 import api from "@/utils/api";
+import { PVMessageType } from "@/types/PVMessage";
 
-const MessageInput = () => {
+type MessageInputProps = {
+  replyingTo: PVMessageType | null;
+  onCancelReply: () => void;
+};
+
+const MessageInput = ({ replyingTo, onCancelReply }: MessageInputProps) => {
   const [message, setMessage] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // وضعیت‌های مربوط به ضبط صدا
   const [isRecording, setIsRecording] = useState(false);
@@ -32,6 +40,13 @@ const MessageInput = () => {
 
   const { userId } = useParams();
   const { signal } = useSignalR();
+
+  // فوکوس اتوماتیک روی اینپوت بعد از کلیک روی Reply
+  useEffect(() => {
+    if (replyingTo) {
+      inputRef.current?.focus();
+    }
+  }, [replyingTo]);
 
   // تایمر زمان ضبط ویس
   useEffect(() => {
@@ -97,7 +112,6 @@ const MessageInput = () => {
         type: "audio/webm",
       });
 
-      // ارسال ویس به عنوان فایل مدیا
       await sendVoiceMessage(audioFile);
     };
 
@@ -140,9 +154,16 @@ const MessageInput = () => {
       setUploadProgress(0);
       const mediaUrl = await uploadFileToLiara(voiceFile);
 
-      await signal?.send("SendMessage", null, Number(userId), mediaUrl);
+      await signal?.send(
+        "SendMessage",
+        null,
+        Number(userId),
+        mediaUrl,
+        replyingTo ? replyingTo.id : null,
+      );
 
       setUploadProgress(null);
+      onCancelReply();
     } catch (error) {
       console.error(error);
       setUploadProgress(null);
@@ -165,11 +186,13 @@ const MessageInput = () => {
         message.trim() || null,
         Number(userId),
         mediaUrl,
+        replyingTo ? replyingTo.id : null,
       );
 
       setMessage("");
       setSelectedFile(null);
       setUploadProgress(null);
+      onCancelReply();
       if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (error) {
       setUploadProgress(null);
@@ -181,6 +204,29 @@ const MessageInput = () => {
 
   return (
     <div className="border-t border-white/10 bg-black/25 p-3 backdrop-blur-xl sm:p-4">
+      {/* بنر ریپلای بالای اینپوت (مشابه تلگرام) */}
+      {replyingTo && (
+        <div className="mx-auto mb-2 flex max-w-4xl items-center justify-between gap-3 rounded-xl border-l-4 border-blue-500 bg-white/5 px-3 py-2 text-xs backdrop-blur-md animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <div className="flex items-center gap-2.5 overflow-hidden">
+            <Reply className="size-4 text-blue-400 shrink-0 rotate-180" />
+            <div className="flex flex-col truncate">
+              <span className="font-semibold text-blue-400">پاسخ به پیام</span>
+              <span className="truncate text-zinc-300">
+                {replyingTo.text ||
+                  (replyingTo.mediaUrl ? "📎 فایل ضمیمه" : "پیام")}
+              </span>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onCancelReply}
+            className="rounded-full p-1 text-zinc-400 hover:bg-white/10 hover:text-white"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
+      )}
+
       {/* فایل انتخاب‌شده / پیش‌نمایش آپلود */}
       {selectedFile && (
         <div className="mx-auto mb-2 flex max-w-4xl items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-zinc-300">
@@ -267,6 +313,7 @@ const MessageInput = () => {
             </Button>
 
             <Input
+              ref={inputRef}
               value={message}
               onChange={(event) => setMessage(event.target.value)}
               onKeyDown={(event) => {
@@ -279,7 +326,9 @@ const MessageInput = () => {
               placeholder={
                 isUploading
                   ? `Uploading... ${uploadProgress}%`
-                  : "Write a message..."
+                  : replyingTo
+                    ? "پاسخ خود را بنویسید..."
+                    : "Write a message..."
               }
               className="h-10 min-w-0 border-0 bg-transparent px-1 text-sm text-white placeholder:text-zinc-500 focus-visible:ring-0 sm:text-base"
             />
@@ -293,7 +342,6 @@ const MessageInput = () => {
               <Smile className="size-5" />
             </Button>
 
-            {/* اگر متنی تایپ شده باشد یا فایل انتخاب شده باشد، دکمه Send و اگر خالی باشد دکمه Mic نمایش داده می‌شود */}
             {canSendText || isUploading ? (
               <Button
                 onClick={SendMessage}
