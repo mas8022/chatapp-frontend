@@ -23,6 +23,7 @@ import {
 import ReplyBtn from "./ReplyBtn";
 import EditBtn from "./EditBtn";
 import { HubConnection } from "@microsoft/signalr";
+import DeleteBtn from "./DeleteBtn";
 
 const isVideoUrl = (url: string) => {
   return /\.(mp4|webm|mov|mkv)$/i.test(url);
@@ -273,15 +274,7 @@ const Message = ({
             <EditBtn message={message} signal={signal} />
           )}
 
-          {isMe && (
-            <>
-              <ContextMenuSeparator className="my-1 bg-zinc-800/80" />
-              <ContextMenuItem className="flex cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-rose-400 transition-colors hover:bg-rose-500/10 focus:bg-rose-500/15 focus:text-rose-300">
-                <Trash2 className="size-4 text-rose-500" />
-                <span>حذف پیام</span>
-              </ContextMenuItem>
-            </>
-          )}
+          {isMe && <DeleteBtn signal={signal} messageId={message.id}/>}
         </ContextMenuContent>
       </ContextMenu>
     </div>

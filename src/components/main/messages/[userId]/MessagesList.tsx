@@ -29,7 +29,6 @@ const MessagesList = ({ onReply, signal }: MessagesListProps) => {
     const targetId = Number(receiverId);
     signal.invoke("JoinPrivateChat", targetId);
 
-    // لیسنر دریافت پیام جدید
     const handleReceiveMessage = (newMessage: PVMessageType) => {
       setChatMessages((p = []) => {
         if (p.some((m) => m.id === newMessage.id)) return p;
@@ -37,7 +36,6 @@ const MessagesList = ({ onReply, signal }: MessagesListProps) => {
       });
     };
 
-    // لیسنر ویرایش پیام
     const handleUpdatePVMessage = (updatedMessage: {
       id: number;
       text: string;
@@ -50,8 +48,13 @@ const MessagesList = ({ onReply, signal }: MessagesListProps) => {
       );
     };
 
+    const handleDeletePVMessage = (messageId: number) => {
+      setChatMessages((p = []) => p.filter((i) => i.id !== messageId));
+    };
+
     signal.on("ReceiveNewMessage", handleReceiveMessage);
     signal.on("UpdatePVMessage", handleUpdatePVMessage);
+    signal.on("PVMessageDeleted", handleDeletePVMessage);
 
     return () => {
       signal.off("ReceiveNewMessage", handleReceiveMessage);
