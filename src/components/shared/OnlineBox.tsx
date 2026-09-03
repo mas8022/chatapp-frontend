@@ -1,7 +1,14 @@
 import useOnlinePVUser from "@/hooks/useOnlinePVUser";
+import { HubConnection } from "@microsoft/signalr";
 
-const OnlineBox = ({ receiverId = "" }: { receiverId?: any }) => {
-  const { isOnline } = useOnlinePVUser(String(receiverId));
+const OnlineBox = ({
+  receiverId = "",
+  signal,
+}: {
+  receiverId?: any;
+  signal: HubConnection | null;
+}) => {
+  const { isOnline } = useOnlinePVUser(String(receiverId), signal);
 
   return (
     isOnline && (

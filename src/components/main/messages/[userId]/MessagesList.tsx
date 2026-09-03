@@ -2,26 +2,26 @@
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import useGetPVMessages from "@/hooks/useGetPVMessages";
-import { useSignalR } from "@/hooks/useSignalR";
 import { PVMessageType } from "@/types/PVMessage";
 import { X } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Message from "./Message";
+import { HubConnection } from "@microsoft/signalr";
 
 type MessagesListProps = {
   onReply: (message: PVMessageType) => void;
+  signal: HubConnection | null;
 };
 
-const MessagesList = ({ onReply }: MessagesListProps) => {
+const MessagesList = ({ onReply, signal }: MessagesListProps) => {
   const { userId: receiverId } = useParams<{ userId: string }>();
   const [chatMessages, setChatMessages] = useState<PVMessageType[]>([]);
   const [previewMedia, setPreviewMedia] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
   useGetPVMessages(setChatMessages);
-  const { signal } = useSignalR();
 
   useEffect(() => {
     if (!signal || !receiverId) return;
@@ -29,14 +29,33 @@ const MessagesList = ({ onReply }: MessagesListProps) => {
     const targetId = Number(receiverId);
     signal.invoke("JoinPrivateChat", targetId);
 
+    // لیسنر دریافت پیام جدید
     const handleReceiveMessage = (newMessage: PVMessageType) => {
-      setChatMessages((p = []) => [...p, newMessage]);
+      setChatMessages((p = []) => {
+        if (p.some((m) => m.id === newMessage.id)) return p;
+        return [...p, newMessage];
+      });
+    };
+
+    // لیسنر ویرایش پیام
+    const handleUpdatePVMessage = (updatedMessage: {
+      id: number;
+      text: string;
+      senderId: number;
+    }) => {
+      setChatMessages((p = []) =>
+        p.map((m) =>
+          m.id === updatedMessage.id ? { ...m, text: updatedMessage.text } : m,
+        ),
+      );
     };
 
     signal.on("ReceiveNewMessage", handleReceiveMessage);
+    signal.on("UpdatePVMessage", handleUpdatePVMessage);
 
     return () => {
       signal.off("ReceiveNewMessage", handleReceiveMessage);
+      signal.off("UpdatePVMessage", handleUpdatePVMessage);
       signal.invoke("LeavePrivateChat", targetId);
     };
   }, [signal, receiverId]);
@@ -60,6 +79,8 @@ const MessagesList = ({ onReply }: MessagesListProps) => {
               receiverId={receiverId}
               setPreviewMedia={setPreviewMedia}
               onReply={onReply}
+              setChatMessages={setChatMessages}
+              signal={signal}
             />
           ))}
 

@@ -1,25 +1,23 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSignalR } from "./useSignalR";
+import { HubConnection } from "@microsoft/signalr";
 
 interface PresencePayload {
   userId: number;
   isOnline: boolean;
 }
 
-const useOnlinePVUser = (receiverUserId = "") => {
+const useOnlinePVUser = (receiverUserId = "", signal: HubConnection | null) => {
   const params = useParams();
   const receiverId = (params?.userId as string) ?? String(receiverUserId);
   const [isOnline, setIsOnline] = useState<boolean>(false);
 
-  const { signal } = useSignalR(
-    "UserPresenceChanged",
-    (data: PresencePayload) => {
-      if (String(data.userId) === String(receiverId)) {
-        setIsOnline(data.isOnline);
-      }
-    },
-  );
+  useSignalR("UserPresenceChanged", (data: PresencePayload) => {
+    if (String(data.userId) === String(receiverId)) {
+      setIsOnline(data.isOnline);
+    }
+  });
 
   useEffect(() => {
     // اگر سیگنال آماده نبود یا receiverId وجود نداشت کاری نکن

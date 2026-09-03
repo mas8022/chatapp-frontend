@@ -20,19 +20,17 @@ const LastMessage = ({ contact }: { contact: ContactType }) => {
     if (!signal) return;
 
     const handler = (message: NewMessageType) => {
-      // فقط اگر پیام مربوط به این مخاطب است ست شود
       if (
-        message.senderId === contact.id ||
-        message.receiverId === contact.id
+        message.senderId === contact.id
       ) {
         setNewMessage(message);
       }
     };
 
-    signal.on("ReceiveNewMessage", handler);
+    signal.on("ReceiveLastMessage", handler);
 
     return () => {
-      signal.off("ReceiveNewMessage", handler);
+      signal.off("ReceiveLastMessage", handler);
     };
   }, [signal, contact.id]);
 

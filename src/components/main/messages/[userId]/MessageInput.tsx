@@ -13,25 +13,29 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useSignalR } from "@/hooks/useSignalR";
 import { useParams } from "next/navigation";
 import axios from "axios";
 import api from "@/utils/api";
 import { PVMessageType } from "@/types/PVMessage";
+import { HubConnection } from "@microsoft/signalr";
 
 type MessageInputProps = {
   replyingTo: PVMessageType | null;
   onCancelReply: () => void;
+    signal: HubConnection | null;
+  
 };
 
-const MessageInput = ({ replyingTo, onCancelReply }: MessageInputProps) => {
+const MessageInput = ({
+  replyingTo,
+  onCancelReply,
+  signal,
+}: MessageInputProps) => {
   const [message, setMessage] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  // وضعیت‌های مربوط به ضبط صدا
   const [isRecording, setIsRecording] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -39,8 +43,6 @@ const MessageInput = ({ replyingTo, onCancelReply }: MessageInputProps) => {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const { userId } = useParams();
-  const { signal } = useSignalR();
-
   // فوکوس اتوماتیک روی اینپوت بعد از کلیک روی Reply
   useEffect(() => {
     if (replyingTo) {
@@ -87,7 +89,6 @@ const MessageInput = ({ replyingTo, onCancelReply }: MessageInputProps) => {
       mediaRecorder.start();
       setIsRecording(true);
     } catch (err) {
-      console.error("Error accessing microphone:", err);
       alert("دسترسی به میکروفون داده نشد.");
     }
   };
@@ -165,7 +166,6 @@ const MessageInput = ({ replyingTo, onCancelReply }: MessageInputProps) => {
       setUploadProgress(null);
       onCancelReply();
     } catch (error) {
-      console.error(error);
       setUploadProgress(null);
     }
   };

@@ -6,7 +6,6 @@ import {
   Mic,
   ZoomIn,
   Trash2,
-  Edit3,
   CornerUpLeft,
   Video,
   Image as ImageIcon,
@@ -22,13 +21,8 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import ReplyBtn from "./ReplyBtn";
-
-type PropsType = {
-  receiverId: string;
-  message: PVMessageType;
-  setPreviewMedia: Dispatch<SetStateAction<string | null>>;
-  onReply?: (message: PVMessageType) => void;
-};
+import EditBtn from "./EditBtn";
+import { HubConnection } from "@microsoft/signalr";
 
 const isVideoUrl = (url: string) => {
   return /\.(mp4|webm|mov|mkv)$/i.test(url);
@@ -38,11 +32,22 @@ const isAudioUrl = (url: string) => {
   return /\.(mp3|wav|ogg|m4a|webm|aac)$/i.test(url);
 };
 
+type PropsType = {
+  receiverId: string;
+  message: PVMessageType;
+  setPreviewMedia: Dispatch<SetStateAction<string | null>>;
+  onReply?: (message: PVMessageType) => void;
+  setChatMessages: Dispatch<SetStateAction<PVMessageType[]>>;
+  signal: HubConnection | null;
+};
+
 const Message = ({
   receiverId,
   message,
   setPreviewMedia,
   onReply,
+  setChatMessages,
+  signal,
 }: PropsType) => {
   const [isHighlighted, setIsHighlighted] = useState<boolean>(false);
 
@@ -265,10 +270,7 @@ const Message = ({
           <ReplyBtn onClick={() => onReply?.(message)} />
 
           {isMe && message.text && (
-            <ContextMenuItem className="flex cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-zinc-300 transition-colors hover:bg-zinc-800/80 focus:bg-zinc-800 focus:text-white">
-              <Edit3 className="size-4 text-amber-400" />
-              <span>ویرایش پیام</span>
-            </ContextMenuItem>
+            <EditBtn message={message} signal={signal} />
           )}
 
           {isMe && (

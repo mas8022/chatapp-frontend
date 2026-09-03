@@ -22,15 +22,18 @@ import {
   User,
 } from "lucide-react";
 import useTimer from "@/hooks/useTimer";
+import { HubConnection } from "@microsoft/signalr";
 
 type PropsType = {
   targetUserId?: number;
   targetUserName?: string;
+  signal:HubConnection | null
 };
 
 const VoiceCallBtn = ({
   targetUserId,
   targetUserName = "کاربر",
+  signal
 }: PropsType) => {
   const {
     callStatus,
@@ -40,7 +43,7 @@ const VoiceCallBtn = ({
     acceptCall,
     endCall,
     toggleMute,
-  } = useVoiceCall(targetUserId);
+  } = useVoiceCall(targetUserId, signal);
 
   const { callDuration } = useTimer(callStatus === "connected");
 

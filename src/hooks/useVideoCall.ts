@@ -1,6 +1,7 @@
 "use client";
 
 import { useSignalR } from "@/hooks/useSignalR";
+import { HubConnection } from "@microsoft/signalr";
 import { useEffect, useRef, useState } from "react";
 
 const ICE_SERVERS = {
@@ -12,7 +13,10 @@ const ICE_SERVERS = {
 
 export type VideoCallStatus = "idle" | "calling" | "incoming" | "connected";
 
-export function useVideoCall(targetUserId?: number) {
+export function useVideoCall(
+  targetUserId?: number,
+  signal?: HubConnection | null,
+) {
   const [callStatus, setCallStatus] = useState<VideoCallStatus>("idle");
   const [callerId, setCallerId] = useState<number | null>(null);
   const [isMuted, setIsMuted] = useState(false);
@@ -24,8 +28,6 @@ export function useVideoCall(targetUserId?: number) {
 
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
-
-  const { signal } = useSignalR();
 
   // ساخت RTCPeerConnection
   const createPeerConnection = (targetId: number) => {
@@ -82,9 +84,7 @@ export function useVideoCall(targetUserId?: number) {
           await pcRef.current.addIceCandidate(
             new RTCIceCandidate(data.candidate),
           );
-        } catch (e) {
-          console.error("Error adding ice candidate:", e);
-        }
+        } catch (e) {}
       }
     };
 
@@ -129,7 +129,6 @@ export function useVideoCall(targetUserId?: number) {
 
       await signal.invoke("CallUserVideo", targetUserId, offer);
     } catch (err) {
-      console.error("Error starting video call:", err);
       cleanup();
     }
   };
@@ -160,7 +159,6 @@ export function useVideoCall(targetUserId?: number) {
       await signal.invoke("AnswerVideoCall", callerId, answer);
       setCallStatus("connected");
     } catch (err) {
-      console.error("Error accepting video call:", err);
       cleanup();
     }
   };

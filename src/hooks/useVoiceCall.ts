@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useSignalR } from "./useSignalR";
+import { HubConnection } from "@microsoft/signalr";
 
 const ICE_SERVERS = {
   iceServers: [
@@ -11,7 +12,7 @@ const ICE_SERVERS = {
 
 export type CallStatus = "idle" | "calling" | "incoming" | "connected";
 
-export function useVoiceCall(targetUserId?: number) {
+export function useVoiceCall(targetUserId?: number, signal?: HubConnection | null) {
   const [callStatus, setCallStatus] = useState<CallStatus>("idle");
   const [callerId, setCallerId] = useState<number | null>(null);
   const [isMuted, setIsMuted] = useState(false);
@@ -20,8 +21,6 @@ export function useVoiceCall(targetUserId?: number) {
   const localStreamRef = useRef<MediaStream | null>(null);
   const remoteAudioRef = useRef<HTMLAudioElement | null>(null);
   const incomingOfferRef = useRef<RTCSessionDescriptionInit | null>(null);
-
-  const { signal } = useSignalR();
 
   // ایجاد عنصر صوتی مخفی برای پخش صدای طرف مقابل
   useEffect(() => {
@@ -93,9 +92,7 @@ export function useVoiceCall(targetUserId?: number) {
           await pcRef.current.addIceCandidate(
             new RTCIceCandidate(data.candidate),
           );
-        } catch (e) {
-          console.error("Error adding ice candidate:", e);
-        }
+        } catch (e) {}
       }
     };
 
@@ -136,7 +133,6 @@ export function useVoiceCall(targetUserId?: number) {
 
       await signal.invoke("CallUser", targetUserId, offer);
     } catch (err) {
-      console.error(err);
       cleanup();
     }
   };
@@ -163,7 +159,6 @@ export function useVoiceCall(targetUserId?: number) {
       await signal.invoke("AnswerCall", callerId, answer);
       setCallStatus("connected");
     } catch (err) {
-      console.error(err);
       cleanup();
     }
   };
