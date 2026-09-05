@@ -8,7 +8,7 @@ interface PresencePayload {
   isOnline: boolean;
 }
 
-const useOnlinePVUser = (receiverUserId = "", signal: HubConnection | null) => {
+const useOnlinePVUser = (receiverUserId = "", signal?: HubConnection | null) => {
   const params = useParams();
   const receiverId = (params?.userId as string) ?? String(receiverUserId);
   const [isOnline, setIsOnline] = useState<boolean>(false);

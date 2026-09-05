@@ -71,7 +71,7 @@ const MessagesList = ({ onReply, signal }: MessagesListProps) => {
     <>
       <ScrollArea className="min-h-0 flex-1">
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-3 p-4 sm:p-6">
-          <div className="mx-auto my-1 rounded-full border border-white/10 bg-white/5 px-3.5 py-1 text-[11px] text-zinc-400 backdrop-blur-md">
+          <div className="mx-auto my-1 rounded-full border border-zinc-200/80 bg-zinc-200/60 px-3.5 py-1 text-[11px] font-medium text-zinc-600 backdrop-blur-md dark:border-white/10 dark:bg-white/5 dark:text-zinc-400">
             Today
           </div>
 
@@ -95,7 +95,7 @@ const MessagesList = ({ onReply, signal }: MessagesListProps) => {
       {previewMedia && (
         <div
           onClick={() => setPreviewMedia(null)}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-md animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-md animate-in fade-in duration-200"
         >
           <button
             type="button"

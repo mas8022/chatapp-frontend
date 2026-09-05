@@ -1,3 +1,4 @@
+// app/layout.tsx
 import "./globals.css";
 import RefreshTokenProvider from "@/providers/RefreshTokenProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
@@ -19,6 +20,7 @@ export default function RootLayout({
       className={cn("font-sans", geist.variable)}
       suppressHydrationWarning
     >
+      {/* اضافه کردن bg-white text-zinc-900 برای Light و dark:bg-zinc-950 dark:text-zinc-50 برای Dark */}
       <body className="min-h-screen flex flex-col bg-white text-zinc-900 antialiased transition-colors duration-200 dark:bg-zinc-950 dark:text-zinc-50">
         <QueryProvider>
           <RefreshTokenProvider>

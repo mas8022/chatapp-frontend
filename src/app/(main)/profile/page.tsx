@@ -94,26 +94,35 @@ const ProfilePage = () => {
 
   return (
     <div
-      className="relative min-h-screen bg-[#09090b] text-zinc-100 flex items-center justify-center p-4 sm:p-6
-     antialiased selection:bg-blue-500/20 selection:text-blue-300"
+      className="relative flex min-h-screen items-center justify-center bg-slate-50 p-4 text-zinc-900 
+      antialiased selection:bg-blue-500/20 selection:text-blue-600 transition-colors duration-300
+      dark:bg-[#09090b] dark:text-zinc-100 dark:selection:text-blue-300 sm:p-6"
     >
+      {/* Glow Effect پشت کارت */}
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-85 h-85
-       bg-blue-600/10 rounded-full blur-[120px] pointer-events-none"
+        className="pointer-events-none absolute left-1/2 top-1/2 size-80 -translate-x-1/2 -translate-y-1/2
+       rounded-full bg-blue-500/15 blur-[120px] dark:bg-blue-600/10"
       />
 
-      <div className="relative w-full max-w-105">
+      <div className="relative w-full max-w-md">
+        {/* Main Card Container */}
         <div
-          className="relative overflow-hidden rounded-[28px] border border-white/8
-         bg-zinc-900/40 p-6 sm:p-7 backdrop-blur-2xl shadow-[0_8px_40px_-12px_rgba(0,0,0,0.8)]"
+          className="relative overflow-hidden rounded-[28px] border border-zinc-200/80 bg-white/75 p-6 shadow-2xl 
+          shadow-slate-200/60 backdrop-blur-2xl transition-colors duration-300 dark:border-white/10 dark:bg-zinc-900/40 
+          dark:shadow-[0_8px_40px_-12px_rgba(0,0,0,0.8)] sm:p-7"
         >
+          {/* Avatar Section */}
           <div className="flex flex-col items-center text-center">
-            <div className="relative group mb-3">
-              <Avatar className="size-24 rounded-full border-2 border-white/10 shadow-2xl transition-all duration-300 group-hover:scale-[1.03] group-hover:border-blue-500/50">
+            <div className="group relative mb-3">
+              <Avatar className="size-24 rounded-full border-2 border-zinc-200/90 shadow-md transition-all duration-300 group-hover:scale-[1.03] group-hover:border-blue-500/60 dark:border-white/10 dark:shadow-2xl dark:group-hover:border-blue-500/50">
                 {avatarPreview && (
-                  <AvatarImage src={avatarPreview} alt="Profile" />
+                  <AvatarImage
+                    src={avatarPreview}
+                    alt="Profile"
+                    className="object-cover"
+                  />
                 )}
-                <AvatarFallback className="bg-linear-to-tr from-blue-600 via-indigo-600 to-violet-500 text-white text-2xl font-bold uppercase tracking-wider">
+                <AvatarFallback className="bg-gradient-to-tr from-blue-600 via-indigo-600 to-violet-500 text-2xl font-bold uppercase tracking-wider text-white">
                   {currentFullName.trim().slice(0, 1) || "U"}
                 </AvatarFallback>
               </Avatar>
@@ -121,10 +130,10 @@ const ProfilePage = () => {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute inset-0 rounded-full bg-black/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-all duration-200 cursor-pointer text-white"
+                className="absolute inset-0 flex cursor-pointer flex-col items-center justify-center rounded-full bg-black/50 text-white opacity-0 backdrop-blur-[2px] transition-all duration-200 group-hover:opacity-100"
                 title="Change Photo"
               >
-                <Camera className="size-5 mb-0.5 text-zinc-200" />
+                <Camera className="mb-0.5 size-5 text-zinc-100" />
                 <span className="text-[10px] font-medium tracking-wide">
                   Edit
                 </span>
@@ -139,64 +148,65 @@ const ProfilePage = () => {
               className="hidden"
             />
 
+            {/* Username Copy Chip */}
             <button
               type="button"
               onClick={copy}
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-800/50
-               hover:bg-zinc-800/90 border border-white/6 hover:border-white/15 text-xs
-                text-zinc-400 hover:text-zinc-200 transition-all active:scale-95 group/btn"
+              className="group/btn inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-100/80 px-3 py-1 text-xs text-zinc-600 transition-all hover:border-zinc-300 hover:bg-zinc-200/80 hover:text-zinc-900 active:scale-95 dark:border-white/10 dark:bg-zinc-800/50 dark:text-zinc-400 dark:hover:border-white/20 dark:hover:bg-zinc-800/90 dark:hover:text-zinc-200"
               title="Click to copy handle"
             >
-              <AtSign className="size-3 text-zinc-500 group-hover/btn:text-blue-400 transition-colors" />
+              <AtSign className="size-3 text-zinc-400 transition-colors group-hover/btn:text-blue-500 dark:text-zinc-500 dark:group-hover/btn:text-blue-400" />
               <span className="font-mono">{user?.username}</span>
-              <span className="w-px h-3 bg-zinc-700/60 mx-0.5" />
+              <span className="mx-0.5 h-3 w-px bg-zinc-300 dark:bg-zinc-700/60" />
               {isCopied ? (
-                <span className="text-[10px] text-emerald-400 font-medium flex items-center gap-0.5">
+                <span className="flex items-center gap-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
                   <Check className="size-3 stroke-[2.5]" /> Copied
                 </span>
               ) : (
-                <Copy className="size-3 text-zinc-500 group-hover/btn:text-zinc-300" />
+                <Copy className="size-3 text-zinc-400 transition-colors group-hover/btn:text-zinc-700 dark:text-zinc-500 dark:group-hover/btn:text-zinc-300" />
               )}
             </button>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="mt-7 space-y-4">
+            {/* Full Name */}
             <div className="space-y-1.5">
-              <label className="text-[11px] font-medium uppercase tracking-wider text-zinc-500 ml-1">
+              <label className="ml-1 text-[11px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                 Name
               </label>
-              <div className="relative group/input">
+              <div className="group/input relative">
                 <Input
                   {...register("fullName")}
                   placeholder="Your full name"
-                  className={`h-11 rounded-2xl bg-zinc-950/50 border-white/6 hover:border-white/10 text-zinc-100 placeholder:text-zinc-600 pl-10 text-sm transition-all shadow-inner ${
+                  className={`h-11 rounded-2xl border bg-zinc-100/70 pl-10 text-sm text-zinc-900 placeholder:text-zinc-400 shadow-inner transition-all hover:border-zinc-300 dark:bg-zinc-950/50 dark:border-white/10 dark:hover:border-white/20 dark:text-zinc-100 dark:placeholder:text-zinc-600 ${
                     errors.fullName
-                      ? "border-rose-500/50 focus-visible:border-rose-500/80 focus-visible:ring-rose-500/20"
-                      : "focus-visible:border-blue-500/50 focus-visible:ring-2 focus-visible:ring-blue-500/20"
+                      ? "border-rose-500/60 focus-visible:border-rose-500 focus-visible:ring-rose-500/20"
+                      : "border-zinc-200 focus-visible:border-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500/20"
                   }`}
                 />
                 <User
-                  className={`size-4 absolute left-3.5 top-3.5 transition-colors ${
+                  className={`absolute left-3.5 top-3.5 size-4 transition-colors ${
                     errors.fullName
-                      ? "text-rose-400"
-                      : "text-zinc-500 group-focus-within/input:text-blue-400"
+                      ? "text-rose-500"
+                      : "text-zinc-400 group-focus-within/input:text-blue-500 dark:text-zinc-500 dark:group-focus-within/input:text-blue-400"
                   }`}
                 />
               </div>
               {errors.fullName && (
-                <p className="text-[11px] text-rose-400 flex items-center gap-1 ml-1 mt-1 animate-in fade-in-50 duration-200">
+                <p className="ml-1 mt-1 flex items-center gap-1 text-[11px] text-rose-500 animate-in fade-in-50 duration-200 dark:text-rose-400">
                   <AlertCircle className="size-3" />
                   {errors.fullName.message}
                 </p>
               )}
             </div>
 
+            {/* Phone Number (Read-only) */}
             <div className="space-y-1.5">
-              <div className="flex items-center justify-between ml-1">
-                <label className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
+              <div className="ml-1 flex items-center justify-between">
+                <label className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                   Phone Number
                 </label>
-                <span className="text-[10px] text-zinc-500 font-medium bg-zinc-800/40 px-1.5 py-0.5 rounded-md border border-white/4">
+                <span className="rounded-md border border-zinc-200 bg-zinc-100 px-1.5 py-0.5 text-[10px] font-medium text-zinc-500 dark:border-white/10 dark:bg-zinc-800/50 dark:text-zinc-400">
                   Read-only
                 </span>
               </div>
@@ -205,64 +215,62 @@ const ProfilePage = () => {
                   value={user?.phone || ""}
                   readOnly
                   tabIndex={-1}
-                  className="h-11 rounded-2xl bg-zinc-950/30 border-white/4
-                   text-zinc-400 font-mono pl-10 text-sm cursor-default select-all 
-                   focus-visible:ring-0 focus-visible:border-white/4 shadow-inner"
+                  className="h-11 cursor-default select-all rounded-2xl border border-zinc-200/70 bg-zinc-100/50 pl-10 font-mono text-sm text-zinc-500 shadow-inner focus-visible:border-zinc-200/70 focus-visible:ring-0 dark:border-white/5 dark:bg-zinc-950/30 dark:text-zinc-400"
                 />
-                <Phone className="size-4 text-zinc-600 absolute left-3.5 top-3.5" />
+                <Phone className="absolute left-3.5 top-3.5 size-4 text-zinc-400 dark:text-zinc-600" />
               </div>
             </div>
 
+            {/* Bio */}
             <div className="space-y-1.5">
-              <div className="flex justify-between items-center ml-1">
-                <label className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
+              <div className="ml-1 flex items-center justify-between">
+                <label className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                   Bio
                 </label>
-                <span className="text-[10px] text-zinc-600 font-mono">
+                <span className="font-mono text-[10px] text-zinc-400 dark:text-zinc-500">
                   {currentBio.length}/120
                 </span>
               </div>
-              <div className="relative group/input">
+              <div className="group/input relative">
                 <Textarea
                   {...register("bio")}
                   maxLength={120}
                   rows={3}
                   placeholder="A few words about yourself..."
-                  className={`rounded-2xl bg-zinc-950/50 border-white/6 hover:border-white/10 text-zinc-100 placeholder:text-zinc-600 pl-10 pt-3 text-sm resize-none transition-all shadow-inner ${
+                  className={`resize-none rounded-2xl border bg-zinc-100/70 pl-10 pt-3 text-sm text-zinc-900 placeholder:text-zinc-400 shadow-inner transition-all hover:border-zinc-300 dark:bg-zinc-950/50 dark:border-white/10 dark:hover:border-white/20 dark:text-zinc-100 dark:placeholder:text-zinc-600 ${
                     errors.bio
-                      ? "border-rose-500/50 focus-visible:border-rose-500/80 focus-visible:ring-rose-500/20"
-                      : "focus-visible:border-blue-500/50 focus-visible:ring-2 focus-visible:ring-blue-500/20"
+                      ? "border-rose-500/60 focus-visible:border-rose-500 focus-visible:ring-rose-500/20"
+                      : "border-zinc-200 focus-visible:border-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500/20"
                   }`}
                 />
                 <FileText
-                  className={`size-4 absolute left-3.5 top-3.5 transition-colors ${
+                  className={`absolute left-3.5 top-3.5 size-4 transition-colors ${
                     errors.bio
-                      ? "text-rose-400"
-                      : "text-zinc-500 group-focus-within/input:text-blue-400"
+                      ? "text-rose-500"
+                      : "text-zinc-400 group-focus-within/input:text-blue-500 dark:text-zinc-500 dark:group-focus-within/input:text-blue-400"
                   }`}
                 />
               </div>
               {errors.bio && (
-                <p className="text-[11px] text-rose-400 flex items-center gap-1 ml-1 mt-1 animate-in fade-in-50 duration-200">
+                <p className="ml-1 mt-1 flex items-center gap-1 text-[11px] text-rose-500 animate-in fade-in-50 duration-200 dark:text-rose-400">
                   <AlertCircle className="size-3" />
                   {errors.bio.message}
                 </p>
               )}
             </div>
 
+            {/* Submit Button */}
             <div className="pt-2">
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full h-11 rounded-2xl font-medium text-sm transition-all duration-300
-                   shadow-lg active:scale-[0.98] bg-linear-to-r from-blue-600 to-indigo-600
-                   hover:from-blue-500 hover:to-indigo-500 text-white shadow-blue-500/25`}
+                className="h-11 w-full rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-sm font-medium text-white shadow-lg shadow-blue-500/25 transition-all duration-300 hover:from-blue-500 hover:to-indigo-500 active:scale-[0.98] disabled:opacity-70 cursor-pointer"
               >
                 {isSubmitting ? (
                   <Loader2 className="size-4 animate-spin text-white" />
                 ) : (
                   <span className="flex items-center gap-1.5">
-                    <Sparkles className="size-3.5 opacity-80" /> Save Profile
+                    <Sparkles className="size-3.5 opacity-90" /> Save Profile
                   </span>
                 )}
               </Button>
