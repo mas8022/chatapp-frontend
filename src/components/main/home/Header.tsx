@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import useGetUsersBySearch from "@/hooks/useGetUsersBySearch";
 import { Loader2, MoreVertical, Search } from "lucide-react";
+import MoreBtn from "./MoreBtn";
 
 const Header = () => {
   const { users, isPending, search, setSearch } = useGetUsersBySearch();
@@ -22,14 +23,7 @@ const Header = () => {
           </p>
         </div>
 
-        <Button
-          size="icon"
-          variant="ghost"
-          className="rounded-xl text-zinc-300 hover:bg-blue-500/15 hover:text-blue-400"
-          aria-label="More options"
-        >
-          <MoreVertical className="size-5" />
-        </Button>
+        <MoreBtn />
       </div>
 
       <div className="relative">

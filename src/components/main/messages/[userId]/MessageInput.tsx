@@ -18,12 +18,12 @@ import axios from "axios";
 import api from "@/utils/api";
 import { PVMessageType } from "@/types/PVMessage";
 import { HubConnection } from "@microsoft/signalr";
+import useTimer from "@/hooks/useTimer";
 
 type MessageInputProps = {
   replyingTo: PVMessageType | null;
   onCancelReply: () => void;
-    signal: HubConnection | null;
-  
+  signal: HubConnection | null;
 };
 
 const MessageInput = ({
@@ -37,41 +37,17 @@ const MessageInput = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [isRecording, setIsRecording] = useState(false);
-  const [recordingDuration, setRecordingDuration] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const { userId } = useParams();
-  // فوکوس اتوماتیک روی اینپوت بعد از کلیک روی Reply
   useEffect(() => {
     if (replyingTo) {
       inputRef.current?.focus();
     }
   }, [replyingTo]);
 
-  // تایمر زمان ضبط ویس
-  useEffect(() => {
-    if (isRecording) {
-      setRecordingDuration(0);
-      timerRef.current = setInterval(() => {
-        setRecordingDuration((prev) => prev + 1);
-      }, 1000);
-    } else {
-      if (timerRef.current) clearInterval(timerRef.current);
-    }
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [isRecording]);
-
-  const formatTimer = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs
-      .toString()
-      .padStart(2, "0")}`;
-  };
+  const { callDuration } = useTimer(isRecording);
 
   const startRecording = async () => {
     try {
@@ -106,11 +82,13 @@ const MessageInput = ({
     if (!mediaRecorderRef.current || !isRecording) return;
 
     mediaRecorderRef.current.onstop = async () => {
-      const audioBlob = new Blob(audioChunksRef.current, {
-        type: "audio/webm",
-      });
-      const audioFile = new File([audioBlob], `voice_${Date.now()}.webm`, {
-        type: "audio/webm",
+      // گرفتن تایپ واقعی مرورگر یا پیش‌فرض audio/webm
+      const mimeType = mediaRecorderRef.current?.mimeType || "audio/webm";
+      const ext = mimeType.includes("mp4") ? "m4a" : "webm";
+
+      const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+      const audioFile = new File([audioBlob], `voice_${Date.now()}.${ext}`, {
+        type: mimeType,
       });
 
       await sendVoiceMessage(audioFile);
@@ -263,7 +241,7 @@ const MessageInput = ({
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
               </span>
               <span className="font-mono text-sm text-red-400 font-medium">
-                {formatTimer(recordingDuration)}
+                {callDuration}
               </span>
             </div>
 
