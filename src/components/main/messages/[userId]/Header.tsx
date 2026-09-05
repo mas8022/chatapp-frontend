@@ -57,7 +57,7 @@ const Header = ({ signal }: { signal: HubConnection | null }) => {
         </div>
       </div>
 
-      <div className="flex shrink-0 items-center gap-1">
+      <div className="flex shrink-0 items-center sm:gap-2">
         <VoiceCallBtn
           targetUserId={user.id}
           targetUserName={user.name || user.username}

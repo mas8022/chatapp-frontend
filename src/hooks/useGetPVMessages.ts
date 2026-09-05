@@ -1,19 +1,75 @@
+"use client";
+import { PVMessageType } from "@/types/PVMessage";
 import ResType from "@/types/response";
 import api from "@/utils/api";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-const useGetPVMessages = (setChatMessages: (val: any[]) => void) => {
-  const { userId: receiverId } = useParams();
+type PvMessagesPage = {
+  messages: PVMessageType[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  hasMore: boolean;
+};
 
-  useQuery({
-    queryKey: ["pv-messages"],
-    queryFn: async () => {
-      const res: ResType = await api.get(`/chat/pv-messages/${receiverId}`);
-      setChatMessages(res.data);
-      return res.data;
+const useGetPVMessages = () => {
+  const [chatMessages, setChatMessages] = useState<PVMessageType[]>([]);
+
+  const { userId: receiverId } = useParams<{ userId: string }>();
+
+  const {
+    data,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+    error,
+  } = useInfiniteQuery<PvMessagesPage>({
+    queryKey: ["pv-messages", receiverId],
+    queryFn: async ({ pageParam }) => {
+      const page = pageParam as number;
+
+      const res: ResType = await api.get(`/chat/pv-messages/${receiverId}`, {
+        params: {
+          page,
+          pageSize: 20,
+        },
+      });
+
+      return res.data as PvMessagesPage;
     },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (!lastPage.hasMore) {
+        return undefined;
+      }
+
+      return lastPage.page + 1;
+    },
+    enabled: Boolean(receiverId),
   });
+
+  useEffect(() => {
+    if (!data) return;
+    console.log(data);
+    
+    const allFetchedMessages = data.pages.flatMap((page) => page.messages);
+    setChatMessages(allFetchedMessages);
+  }, [data]);
+
+  return {
+    chatMessages,
+    setChatMessages,
+    fetchPreviousMessages: fetchNextPage,
+    hasMore: hasNextPage,
+    isFetchingPrevious: isFetchingNextPage,
+    isLoading: isLoading,
+    isError: isError,
+    error: error,
+  };
 };
 
 export default useGetPVMessages;

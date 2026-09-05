@@ -57,7 +57,7 @@ const VoiceCallBtn = ({
           size="icon"
           variant="ghost"
           onClick={startCall}
-          className="hidden rounded-xl text-zinc-300 hover:bg-blue-500/15 hover:text-blue-400 sm:inline-flex"
+          className="rounded-xl text-zinc-300 hover:bg-blue-500/15 hover:text-blue-400"
           aria-label="Voice call"
         >
           <Phone className="size-5" />
