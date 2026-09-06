@@ -49,52 +49,82 @@ const MessageInput = ({
 
   const { callDuration } = useTimer(isRecording);
 
+  const getSupportedMimeType = () => {
+    if (typeof window === "undefined") return "audio/webm";
+    const types = [
+      "audio/webm;codecs=opus",
+      "audio/webm",
+      "audio/mp4",
+      "audio/aac",
+    ];
+    return types.find((type) => MediaRecorder.isTypeSupported(type)) || "";
+  };
+
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
+      const mimeType = getSupportedMimeType();
+
+      const mediaRecorder = new MediaRecorder(
+        stream,
+        mimeType ? { mimeType } : undefined,
+      );
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
       mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
+        if (event.data && event.data.size > 0) {
           audioChunksRef.current.push(event.data);
         }
       };
 
-      mediaRecorder.start();
+      // ارسال چانک‌ها هر ۲۵۰ میلی‌ثانیه برای جلوگیری از خالی ماندن بافر
+      mediaRecorder.start(250);
       setIsRecording(true);
-    } catch {
+    } catch (err) {
+      console.error("Mic access error:", err);
       alert("دسترسی به میکروفون داده نشد.");
     }
   };
 
   const cancelRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stream.getTracks().forEach((t) => t.stop());
-      mediaRecorderRef.current.stop();
+    const recorder = mediaRecorderRef.current;
+    if (recorder) {
+      recorder.onstop = null; // جلوگیری از اجرای ارسال
+      recorder.stream.getTracks().forEach((t) => t.stop());
+      if (recorder.state !== "inactive") recorder.stop();
     }
     setIsRecording(false);
     audioChunksRef.current = [];
   };
 
   const stopAndSendRecording = async () => {
-    if (!mediaRecorderRef.current || !isRecording) return;
+    const recorder = mediaRecorderRef.current;
+    if (!recorder || recorder.state === "inactive") return;
 
-    mediaRecorderRef.current.onstop = async () => {
-      const mimeType = mediaRecorderRef.current?.mimeType || "audio/webm";
-      const ext = mimeType.includes("mp4") ? "m4a" : "webm";
+    recorder.onstop = async () => {
+      // 1. ساخت Blob و فایل پس از اطمینان از تمام شدن ضبط
+      const actualMime = recorder.mimeType || "audio/webm";
+      const ext = actualMime.includes("mp4") ? "m4a" : "webm";
 
-      const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+      const audioBlob = new Blob(audioChunksRef.current, { type: actualMime });
+
+      // قطع تراک‌های استریم بعد از Blobگیری
+      recorder.stream.getTracks().forEach((t) => t.stop());
+
+      if (audioBlob.size === 0) {
+        console.error("Recorded audio blob is empty!");
+        return;
+      }
+
       const audioFile = new File([audioBlob], `voice_${Date.now()}.${ext}`, {
-        type: mimeType,
+        type: actualMime,
       });
 
       await sendVoiceMessage(audioFile);
     };
 
-    mediaRecorderRef.current.stream.getTracks().forEach((t) => t.stop());
-    mediaRecorderRef.current.stop();
+    recorder.stop();
     setIsRecording(false);
   };
 
@@ -313,15 +343,6 @@ const MessageInput = ({
               }
               className="h-10 min-w-0 border-0 bg-transparent px-1 text-sm text-zinc-900 placeholder:text-zinc-400 focus-visible:ring-0 dark:text-white dark:placeholder:text-zinc-500 sm:text-base"
             />
-
-            <Button
-              size="icon"
-              variant="ghost"
-              className="hidden shrink-0 rounded-xl text-zinc-500 hover:bg-zinc-200/60 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-white/10 dark:hover:text-white sm:inline-flex"
-              aria-label="Emoji"
-            >
-              <Smile className="size-5" />
-            </Button>
 
             {canSendText || isUploading ? (
               <Button

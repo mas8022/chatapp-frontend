@@ -54,8 +54,6 @@ const useGetPVMessages = () => {
 
   useEffect(() => {
     if (!data) return;
-    console.log(data);
-    
     const allFetchedMessages = data.pages.flatMap((page) => page.messages);
     setChatMessages(allFetchedMessages);
   }, [data]);

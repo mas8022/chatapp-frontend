@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image"; // اضافه شد
 import { Input } from "@/components/ui/input";
 import useGetUsersBySearch from "@/hooks/useGetUsersBySearch";
 import { Loader2, Search } from "lucide-react";
@@ -57,9 +58,20 @@ const Header = () => {
                     onClick={() => setSearch("")}
                     className="flex items-center gap-3 rounded-lg p-3 transition hover:bg-zinc-100 dark:hover:bg-white/10"
                   >
-                    <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-600 font-semibold text-white shadow-sm">
-                      {avatarLetter}
-                    </div>
+                    {/* بررسی وجود آواتار */}
+                    {user.avatar ? (
+                      <div className="relative size-10 shrink-0 overflow-hidden rounded-full">
+                        <img
+                          src={user.avatar}
+                          alt={displayName}
+                          className="size-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-600 font-semibold text-white shadow-sm">
+                        {avatarLetter}
+                      </div>
+                    )}
 
                     <div className="min-w-0">
                       <p className="truncate font-medium text-zinc-900 dark:text-white">

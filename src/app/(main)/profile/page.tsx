@@ -19,7 +19,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import useGetProfile from "@/hooks/useGetProfile";
+import useGetMyProfile from "@/hooks/useGetMyProfile";
 import useCopy from "@/hooks/useCopy";
 import api from "@/utils/api";
 import ProfileSkeleton from "@/components/main/profile/ProfileSkeleton";
@@ -43,7 +43,7 @@ const ProfilePage = () => {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { user, isPending } = useGetProfile();
+  const { user, isPending } = useGetMyProfile();
   const { copy, isCopied } = useCopy(user?.username);
 
   const {

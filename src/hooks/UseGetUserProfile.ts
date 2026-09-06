@@ -1,6 +1,7 @@
 import ResType from "@/types/response";
 import api from "@/utils/api";
 import { useQuery } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
 
 type ProfileType = {
   id: number;
@@ -11,11 +12,13 @@ type ProfileType = {
   bio?: string;
 };
 
-const useGetProfile = () => {
+const UseGetUserProfile = () => {
+  const { userId } = useParams();
+
   const { data: user, isPending } = useQuery<ProfileType>({
-    queryKey: ["profile"],
+    queryKey: ["user-profile"],
     queryFn: async () => {
-      const res: ResType = await api.get("/users/profile");
+      const res: ResType = await api.get(`/users/user-profile/${userId}`);
       return res.data;
     },
   });
@@ -23,4 +26,4 @@ const useGetProfile = () => {
   return { user, isPending };
 };
 
-export default useGetProfile;
+export default UseGetUserProfile;

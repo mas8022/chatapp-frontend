@@ -133,6 +133,9 @@ const Message = ({
     return <span>پیام</span>;
   };
 
+  console.log(message.mediaUrl!);
+  
+
   return (
     <div
       id={`msg-${message.id}`}
@@ -160,7 +163,7 @@ const Message = ({
           <div
             className={`relative cursor-pointer overflow-hidden rounded-2xl select-none transition-all duration-500 ${
               isMe
-                ? "rounded-tr-xs bg-gradient-to-br from-blue-600 via-blue-600 to-indigo-600 text-white shadow-md shadow-blue-950/30"
+                ? "rounded-tr-xs bg-linear-to-br from-blue-600 via-blue-600 to-indigo-600 text-white shadow-md shadow-blue-950/30"
                 : "rounded-tl-xs border border-white/10 bg-zinc-900/90 text-zinc-100 shadow-md shadow-black/40 backdrop-blur-xl"
             } ${
               isHighlighted

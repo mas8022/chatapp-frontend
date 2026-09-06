@@ -10,6 +10,7 @@ import OnlineBox from "../../../shared/OnlineBox";
 import VoiceCallBtn from "./VoiceCallBtn";
 import { VideoCallBtn } from "./VideoCallBtn";
 import { HubConnection } from "@microsoft/signalr";
+import ProfileBtn from "./ProfileBtn";
 
 const Header = ({ signal }: { signal: HubConnection | null }) => {
   const { user, isPending } = useGetUserById();
@@ -33,19 +34,12 @@ const Header = ({ signal }: { signal: HubConnection | null }) => {
           </Link>
         </Button>
 
-        <div className="relative shrink-0">
-          <Avatar className="size-11 border border-zinc-200 dark:border-white/15">
-            <AvatarImage
-              src={user.avatar || "/images/profile.jpg"}
-              alt={user.name ?? "User avatar"}
-            />
-            <AvatarFallback className="bg-blue-600 text-white dark:bg-blue-700">
-              {user.name ? user.name.slice(0, 2).toUpperCase() : "U"}
-            </AvatarFallback>
-          </Avatar>
-
-          <OnlineBox signal={signal} />
-        </div>
+        <ProfileBtn
+          userId={user.id}
+          signal={signal}
+          avatar={user.avatar}
+          name={user.name}
+        />
 
         <div className="min-w-0">
           <h1 className="truncate font-bold text-zinc-900 dark:text-white">
@@ -68,14 +62,14 @@ const Header = ({ signal }: { signal: HubConnection | null }) => {
           targetUserName={user.name || user.username}
           signal={signal}
         />
-        <Button
+        {/* <Button
           size="icon"
           variant="ghost"
           className="rounded-xl text-zinc-600 hover:bg-blue-500/10 hover:text-blue-600 dark:text-zinc-300 dark:hover:bg-blue-500/15 dark:hover:text-blue-400"
           aria-label="More options"
         >
           <MoreVertical className="size-5" />
-        </Button>
+        </Button> */}
       </div>
     </header>
   );
